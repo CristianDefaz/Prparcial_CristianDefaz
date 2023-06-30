@@ -1,46 +1,64 @@
 <?php
 //TODO: archivos requeridos
 require_once('../config/config.php');
-require_once('usuariosroles.model.php');
+//require_once('../models/empleadosroles.model.php');
 
-class UsuariosModel
+class UsuarioModel
 {
-    public function login($correo, $contrasenia)
+    public function login($usu_correo, $usu_contrasena)
     {
         $con = new ClaseConexion();
         $con = $con->ProcedimientoConectar();
-        $cadena = "SELECT usuario.*, roles.* FROM usuario INNER JOIN Usuarios_Roles on usuario.idUsaurio = Usuarios_Roles.idUsuario INNER JOIN roles on Usuarios_Roles.idRoles = roles.idRoles WHERE correo = '$correo' and contrasenia='$contrasenia'";
+        $cadena = "SELECT * FROM usuario WHERE usu_correo = '$usu_correo' and usu_contrasena='$usu_contrasena'";
+        print $cadena;
+        $datos = mysqli_query($con, $cadena);
+        return $datos;
+   }
+
+   public function todos(){
+    $con = new ClaseConexion();
+    $con = $con->ProcedimientoConectar();
+    $cadena = "SELECT * FROM usuario INNER JOIN rol on usuario.id_rol = rol.id_rol ORDER BY usu_apellido";
+    $datos = mysqli_query($con, $cadena);
+    return $datos;
+}
+
+public function Insertar($Nombres, $Apellidos, $cedula, $telefono, $usu_correo, $usu_contrasena, $idRoles) {
+    $con = new ClaseConexion();
+    $con = $con->ProcedimientoConectar();
+    $cadena = "INSERT INTO `usuario`(`usu_nombre`, `usu_apellido`, `usu_cedula`, `usu_telefono`, `usu_correo`, `usu_contrasena`, `id_rol`) VALUES ('$Nombres', '$Apellidos', '$cedula', '$telefono', '$usu_correo', '$usu_contrasena', '$idRoles')";
+    if (mysqli_query($con, $cadena)) {
+        return 'ok';
+    } else {
+        return mysqli_error($con);
+    }
+}
+    public function uno($idusuario){
+        $con = new ClaseConexion();
+        $con = $con->ProcedimientoConectar();
+        $cadena = "SELECT *FROM `usuario` where id_usuario=$idusuario";
         $datos = mysqli_query($con, $cadena);
         return $datos;
     }
-    public function todos()
-    {  //TODO: CProcedimeinto para obtener todos los registros de la BDD
+    public function Actualizar($idusuario,$Nombres, $Apellidos,$cedula, $telefono, $usu_correo, $usu_contrasena, $idRoles){
         $con = new ClaseConexion();
-        $con = $con->ProcedimientoConectar();
-        $cadena = "SELECT * FROM usuario INNER JOIN Usuarios_Roles on usuario.idUsaurio = Usuarios_Roles.idUsuario INNER JOIN roles on Usuarios_Roles.idRoles = roles.idRoles ORDER BY Apellidos";
-        $datos = mysqli_query($con, $cadena);
-        return $datos;
-    }
-    public function Insertar($Nombres, $Apellidos, $correo, $contrasenia, $idRoles)
-    {
-        $con = new ClaseConexion();
-        $con = $con->ProcedimientoConectar();
-        $cadena = "INSERT INTO `usuario`(`Nombres`, `Apellidos`, `contrasenia`, `correo`) VALUES ('$Nombres','$Apellidos','$contrasenia','$correo')";
-        $datos = mysqli_query($con, $cadena);
-        if (mysqli_insert_id($con) > 0) {
-            //definir el modelo usuarios_roles
-            $UsuarioRoles = new UsuariosRolesModel();
-            return $UsuarioRoles->Insertar(mysqli_insert_id($con), $idRoles);
-        } else {
-            return 'Error al insertar el rol del usuario';
+        $con=$con->ProcedimientoConectar();
+        $cadena = "UPDATE `usuario` SET `usu_nombre`='$Nombres',`usu_apellido`='$Apellidos',`usu_cedula`='$cedula',`usu_telefono`='$telefono',`usu_correo`='$usu_correo',`usu_contrasena`='$usu_contrasena',`id_rol`='$idRoles' WHERE id_usuario=$idusuario";
+        if (mysqli_query($con, $cadena)){
+            return 'ok';
+        }else{
+            return mysqli_error($con);
         }
     }
-    public function  uno($idUsuario)
-    {
+    public function Eliminar($idusuario){
         $con = new ClaseConexion();
-        $con = $con->ProcedimientoConectar();
-        $cadena = "SELECT usuario.*, roles.* FROM `usuario` INNER JOIN Usuarios_Roles on usuario.idUsaurio = Usuarios_Roles.idUsuario INNER JOIN roles on Usuarios_Roles.idRoles = roles.idRoles where usuario.idUsaurio = 1;";
-        $datos = mysqli_query($con, $cadena);
-        return $datos;
+        $con=$con->ProcedimientoConectar();
+        $cadena = "DELETE FROM `usuario` WHERE id_usuario=$idusuario ";
+        if (mysqli_query($con, $cadena)){
+            return 'ok';
+        }else{
+           
+            return mysqli_error($con);
+        }
     }
 }
