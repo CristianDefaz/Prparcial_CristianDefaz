@@ -50,7 +50,7 @@ var cargatipo = () => {
     $("#id_estudiante").html(htmlestudiante);
   });
 
-  // Cargar datos desde el archivo membresia.controller.php
+  // Cargar datos desde el archivo cursos.controller.php
   $.post("../../controllers/cursos.controller.php?op=todos", (listacur) => {
     listacur = JSON.parse(listacur);
     $.each(listacur, (index, cursos) => {
